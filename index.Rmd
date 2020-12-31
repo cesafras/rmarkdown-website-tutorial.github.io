@@ -1,44 +1,13 @@
 ---
-title: "Making free websites with RStudio's R Markdown"
-author:  "[Julie Lowndes](https://github.com/jules32) at [NCEAS](https://www.nceas.ucsb.edu/), 12/14/16"
+title: "Hi there, I'm Cecilia Esther Rabess!"
 output:
-  html_document
+  html_document:
+    includes:
+      in_header: cover.html
 ---
 
-----
-
-It's possible to create well-designed websites for free using [RStudio's R Markdown](http://rmarkdown.rstudio.com/) and hosting them on [Github](http://github.com). This is very new and incredibly cool. It is a really powerful way to communicate science using the same reproducible workflow you use for your analyses and collaborations.
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-library(dplyr)
-library(knitr)
-library(networkD3)
+```{js, echo = FALSE}
+document.title = "Cecilia Esther Rabess"
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r data, echo=FALSE}
-links <- read.csv("~/Desktop/Dataset1-Media-Example-EDGES.csv")
-nodes <- read.csv("~/Desktop/Dataset1-Media-Example-NODES.csv")
-
-el <- data.frame(from=as.numeric(factor(links$from))-1,
-                 to=as.numeric(factor(links$to))-1)
-nl <- cbind(idn=factor(nodes$media, levels=nodes$media), nodes)
-```
-
-```{r plot, echo = FALSE}
-forceNetwork(Links = el, Nodes = nl, Source="from", Target="to",
-             NodeID = "idn", Group = "type.label",linkWidth = 1,
-             linkColour = "#afafaf", fontSize=12, zoom=T, legend=T,
-             Nodesize=6, opacity = 0.8, charge=-300,
-             width = 600, height = 600)
-```
+I'm a novelist and data scientist in San Francisco.
