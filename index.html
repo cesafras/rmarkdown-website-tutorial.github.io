@@ -24,6 +24,9 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<script src="site_libs/d3-4.5.0/d3.min.js"></script>
+<script src="site_libs/forceNetwork-binding-0.4/forceNetwork.js"></script>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -304,22 +307,17 @@ $(document).ready(function () {
 
 <hr />
 <p>It’s possible to create well-designed websites for free using <a href="http://rmarkdown.rstudio.com/">RStudio’s R Markdown</a> and hosting them on <a href="http://github.com">Github</a>. This is very new and incredibly cool. It is a really powerful way to communicate science using the same reproducible workflow you use for your analyses and collaborations.</p>
-<p><strong><em>Creating websites with R Markdown can be done without knowing R or HTML, CSS, etc,</em></strong> and that’s where we’ll start. However, R Markdown integrates with these tools so the more you know the more complex and beautiful your website can be. This tutorial borrows heavily from a lot of great tutorials and resources you should check out too – there are links throughout.</p>
-<p>The best way to learn is to follow along with your own laptop, but all are welcome. We’ll spend half the time with the tutorial and half the time for you to work on your own website and get help. If you bring your laptop please do this beforehand:</p>
-<ol style="list-style-type: decimal">
-<li>install <a href="https://www.rstudio.com/products/rstudio/download/">RStudio</a></li>
-<li>create a <a href="(http://github.com)">GitHub</a> account (<a href="http://happygitwithr.com/github-acct.html">advice</a>)</li>
-<li>set up your computer to talk to GitHub
-<ul>
-<li>have RStudio linked directly (preferred) (<a href="http://happygitwithr.com/hello-git.html">instructions sections 8-14</a>)</li>
-<li>or install the <a href="https://desktop.github.com/">Desktop App</a></li>
-<li>or be familiar with git commands for the command line (<a href="https://try.github.io/levels/1/challenges/1">tutorial</a>)</li>
-</ul></li>
-</ol>
-<hr />
-<p><strong>Examples:</strong></p>
-<p>We have been using R Markdown for the Ocean Health Index: <a href="http://ohi-science.org/ohi-global"><strong>ohi-science.org/ohi-global</strong></a>.<br />
-And R Markdown is much more than just websites – here’s a <a href="http://rmarkdown.rstudio.com/lesson-1.html"><strong>one-minute video about R Markdown</strong></a> to get you excited.</p>
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+</div>
+<div id="including-plots" class="section level2">
+<h2>Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<div id="htmlwidget-98b396506b9a0ab1dde9" style="width:600px;height:600px;" class="forceNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98b396506b9a0ab1dde9">{"x":{"links":{"source":[0,0,0,0,3,4,5,7,7,2,3,0,13,13,14,14,5,8,7,6,6,4,1,1,2,10,10,12,11,4,1,2,3,9,2,3,11,5,12,2,10,3,15,7,2,6,13,13,4,1,2,6],"target":[1,1,2,3,10,14,16,8,8,3,2,14,0,0,16,5,15,9,6,7,9,1,2,0,0,12,13,12,11,8,9,11,5,2,9,11,16,5,10,10,5,16,3,2,7,13,5,3,0,8,4,2],"colour":["#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf","#afafaf"]},"nodes":{"name":["NY Times","Washington Post","Wall Street Journal","USA Today","LA Times","New York Post","CNN","MSNBC","FOX News","ABC","BBC","Yahoo News","Google News","Reuters.com","NYTimes.com","WashingtonPost.com","AOL.com"],"group":["Newspaper","Newspaper","Newspaper","Newspaper","Newspaper","Newspaper","TV","TV","TV","TV","TV","Online","Online","Online","Online","Online","Online"],"nodesize":[20,25,30,32,20,50,56,34,60,23,34,33,23,12,24,28,33]},"options":{"NodeID":"idn","Group":"type.label","colourScale":"d3.scaleOrdinal(d3.schemeCategory20);","fontSize":12,"fontFamily":"serif","clickTextSize":30,"linkDistance":50,"linkWidth":"1","charge":-300,"opacity":0.8,"zoom":true,"legend":true,"arrows":false,"nodesize":true,"radiusCalculation":" Math.sqrt(d.nodesize)+6","bounded":false,"opacityNoHover":0,"clickAction":null}},"evals":[],"jsHooks":[]}</script>
+</div>
 
 
 
