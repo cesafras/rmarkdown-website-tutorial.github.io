@@ -1,71 +1,414 @@
 ---
-title: "First observations"
+title: "Personal Project"
+output: html_document
 ---
 
-With this tutorial, we have a working example website that we will explore together. We'll learn a few rules and look for patterns to get an understanding of what things do. And you can continue to use this website as a reference after the tutorial, along with [**RStudio's instructions for R Markdown websites**](http://rmarkdown.rstudio.com/rmarkdown_websites.html).      
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+library(stringr)
+library(ggplot2)
+library(rJava)
+library(NLP)
+library(openNLP)
+library(dplyr)
+library(igraph)
+library(networkD3)
+library(knitr)
+```
 
-We'll start our exploration online looking at the website architecture, then we'll clone the repo to our local computers. Locally, we will explore further by going back and forth between the R Markdown editor and built webpages, and make modifications. Pushing to Github will make our modifications live!    
+## R Markdown
 
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-----
+```{r palettes, echo=FALSE}
+# Color palettes: for this analysis we use Darjeeling1
+wes_palettes <- list(
+  BottleRocket1 = c("#A42820", "#5F5647", "#9B110E", "#3F5151", "#4E2A1E", "#550307", "#0C1707"),
+  BottleRocket2 = c("#FAD510", "#CB2314", "#273046", "#354823", "#1E1E1E"),
+  Rushmore1 = c("#E1BD6D", "#EABE94", "#0B775E", "#35274A" ,"#F2300F"),
+  Rushmore = c("#E1BD6D", "#EABE94", "#0B775E", "#35274A" ,"#F2300F"),
+  Royal1 = c("#899DA4", "#C93312", "#FAEFD1", "#DC863B"),
+  Royal2 = c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089"),
+  Zissou1 = c("#3B9AB2", "#78B7C5", "#EBCC2A", "#E1AF00", "#F21A00"),
+  Darjeeling1 = c("#FF0000", "#00A08A", "#F2AD00", "#F98400", "#5BBCD6"),
+  Darjeeling2 = c("#ECCBAE", "#046C9A", "#D69C4E", "#ABDDDE", "#000000"),
+  Chevalier1 = c("#446455", "#FDD262", "#D3DDDC", "#C7B19C"),
+  FantasticFox1 = c("#DD8D29", "#E2D200", "#46ACC8", "#E58601", "#B40F20"),
+  Moonrise1 = c("#F3DF6C", "#CEAB07", "#D5D5D3", "#24281A"),
+  Moonrise2 = c("#798E87", "#C27D38", "#CCC591", "#29211F"),
+  Moonrise3 = c("#85D4E3", "#F4B5BD", "#9C964A", "#CDC08C", "#FAD77B"),
+  Cavalcanti1 = c("#D8B70A", "#02401B", "#A2A475", "#81A88D", "#972D15"),
+  GrandBudapest1 = c("#F1BB7B", "#FD6467", "#5B1A18", "#D67236"),
+  GrandBudapest2 = c("#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4"),
+  IsleofDogs1 = c("#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680"),
+  IsleofDogs2 = c("#EAD3BF", "#AA9486", "#B6854D", "#39312F", "#1C1718")
+)
 
-## Exploring online
-
-<br>
-
-<!---this is an html comment that works in Markdown --->
-
-<!--- I use the <br> html tag to force carriage returns in the text--->
-
-### The website itself
-
-This website has 5 pages: 
-
-- Home
-- First Observations
-- Basic Workflow
-- Getting Sophisticated
-- Your Turn
+# If you need more colours than normally found in a palette, you
+# can use a continuous palette to interpolate between existing
+# colours:
+# pal <- wes_palette(21, name = "Zissou1", type = "continuous")
+wes_palette <- function(name, n, type = c("discrete", "continuous")) {
+  type <- match.arg(type)
   
+  pal <- wes_palettes[[name]]
+  if (is.null(pal))
+    stop("Palette not found.")
   
-`github.io` means that there is a Github repo behind this website, and we also know the username and repo name:
-
-**<http://jules32.github.io/rmarkdown-website-tutorial>** <=> **<https://github.com/jules32/rmarkdown-website-tutorial>** 
-
-(Note: you can have github websites point to different urls if you don't want the `github.io`.)
-
-<br>
-
-### The website's repo
-
-Let's go to **<https://github.com/jules32/rmarkdown-website-tutorial>**.  
+  if (missing(n)) {
+    n <- length(pal)
+  }
   
-**First, note the `gh-pages` branch** - this is critical for building free webpages. You can usually name branches whatever you want, but the `gh-pages` name means it can be built as a website. [I set it as my default branch](https://help.github.com/articles/setting-the-default-branch/).
+  if (type == "discrete" && n > length(pal)) {
+    stop("Number of requested colors greater than what palette can offer")
+  }
+  
+  out <- switch(type,
+                continuous = grDevices::colorRampPalette(pal)(n),
+                discrete = pal[1:n]
+  )
+  structure(out, class = "palette", name = name)
+}
+```
 
-![](images/gh-pages.png)
+```{r data, echo=FALSE}
+# Read in the data frame.
+# https://docs.google.com/spreadsheets/d/1ZMf-UDG7AIarLH393TH7oKRzF-XkMN_qt5pVFz-8Hv4/edit?resourcekey=0-3Z9_rgI4qtmTyJMLZLcCDQ#gid=745766201
+dedup <- read.csv("~/Downloads/Personal Project Acknowledgements - center for fiction.csv", na.strings = " ")
 
-<br>
+# Filter for just 2020
+#dedup <- dedup[dedup$Year == 2020,]
 
-**Now let's look at the filenames**. We can recognize the names of the webpages we've seen, and there is also a `_site.yml` file, which is the website's configuration file. The simplest website possible would have 2 files only: `_site.yml` and `index.Rmd`
+# Format all of the strings in the acknowledgments field to exclude single quotes.
+# We exclude these because if we leave them in it escapes the string and throws
+# an error.
+dedup$Text <- gsub("'", '', dedup$Text)
 
-![](https://docs.google.com/drawings/d/1jnXfeJ3i-fwd-t49S5FyeMAX3cJSoCYbyZLLTqFZd7w/pub?w=960&h=720)
+# Remove all the authors for whom we don't have any acknowledgment info (yet.)
+dedup <- dedup %>% filter(Text != "")
+```
 
-<br>
+```{r nlp, echo=FALSE}
+# use NLPs NER annotator to identify person & location entities
+sent_annot = Maxent_Sent_Token_Annotator()
+word_annot = Maxent_Word_Token_Annotator()
+org_annot <- Maxent_Entity_Annotator(kind = "organization") #annotate location
+loc_annot = Maxent_Entity_Annotator(kind = "location") #annotate location
+people_annot = Maxent_Entity_Annotator(kind = "person") #annotate person
+```
 
-## Fork to your account, clone to your computer
+```{r process, echo=FALSE}
+# We want to create a data frame that stores both the thanker and the thankee
+# for each set of acknowledgments. This requires us to loop through the original
+# data frame extracting all of the names and appending the thankees with the name
+# of the thanker.
 
-Let's start digging deeper and playing with this.  
+# This will be a loop
+# Make a list of the thankees for a single author
+# The "text" variable is the Text field from each row of data
+# This becomes the list of text_people which becomes the field called "thankee"
+# The name of the author from the corresponding row is appended to each of the
+# "thankees" in a column called "thanker"
+# Repeat this operation for every row in the data frame
 
-1. Fork the [jules32/rmarkdown-website-tutorial](https://github.com/jules32/rmarkdown-website-tutorial) repo into your own account. 
+df_people <- data.frame()
+df_orgs <- data.frame()
 
-2. Edit the URL for the website by replacing `jules32` with your GitHub username
+for (i in 1:nrow(dedup))
+{
+  text <- dedup[i,]$Text
+  text = as.String(text)
+  annot.l1 = NLP::annotate(text, list(sent_annot,word_annot,people_annot,org_annot))
+  k <- sapply(annot.l1$features, `[[`, "kind")
+  text_people = text[annot.l1[k == "person"]]
+  text_orgs = text[annot.l1[k == "organization"]]
+  
+  if (length(text_people)>0) {
+    df_1 <- as.data.frame(
+      cbind(entity_1 = as.character(rep(dedup[i,]$Author,length(text_people))),
+            entity_2 = text_people))
+  } else {
+    df_1 <- data.frame()
+  }
+  
+  if (length(text_orgs)>0) {
+    df_2 <- as.data.frame(
+      cbind(entity_1 = as.character(rep(dedup[i,]$Author,length(text_orgs))),
+            entity_2 = text_orgs))
+  } else {
+    df_2 <- data.frame()
+  }
+  
+  df_people <- rbind(df_people, df_1)
+  df_orgs <- rbind(df_orgs, df_2)
+}
 
-3. Clone to your local computer using RStudio (preferred) the [Desktop App](https://desktop.github.com/), or the command line.
+####
+# Rename some entities that I know are wrong (manual operation)
+####
 
-![](https://docs.google.com/drawings/d/1yy2VFQy4QqxfOzt-XtTSNA91qoCI7jPo0ob7Pm89SBg/pub?w=960&h=720)
+# Format as character for string functions.
+df_people$entity_2 <- as.character(df_people$entity_2)
+df_orgs$entity_2 <- as.character(df_orgs$entity_2)
 
+# Rename the entities
+df_people[df_people$entity_2 == "Pam Zhang","entity_2"] <- "C Pam Zhang"
+df_people[df_people$entity_2 %in% c("Lan Samantha Chang","Sam Chang"),"entity_2"] <- "Samantha Chang"
+df_orgs[df_orgs$entity_2 == "ICM Partners","entity_2"] <- "ICM"
 
+# Remove some entities
+# Remove: School, University, Bath, MFA
+remove_entities_orgs <- c("School", "University", "Bath", "MFA", "The")
+df_orgs <- df_orgs[-which(df_orgs$entity_2 %in% remove_entities_orgs),]
 
+#####
+# Remove single names from people df (except for the most popular first name)
+#####
 
+# Determine the most thanked first name. Remove all other first name onlies.
+calculate_mode <- function(x) {
+  uniqx <- unique(na.omit(x))
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
 
+modal_name <- calculate_mode(df_people$entity_2)
+
+df_people <- df_people[which(sapply(strsplit(df_people$entity_2, " "), length)>1 | 
+                               df_people$entity_2 == modal_name),]
+
+# Remove from the master list any person entity that is also the writer
+# (entity_1)'s agent. (This is so that we only have writers connecting to
+# agencies in the diagram and not writer > agent > agency which would be more
+# cluttered.)
+
+dedup <- dedup %>%
+  mutate(author_agent_concat = paste(Author,Agent))
+
+df_people <- df_people %>%
+  mutate(author_agent_concat = paste(entity_1,entity_2))
+
+df_people <- anti_join(df_people, dedup)
+
+####
+# Add some organizations that I know are missing (manual operation)
+####
+
+# Make a data frame with all of the authors + manual organizations
+# Organization names (manual list because the model doesn't get literary orgs)
+org_list <- c("Aspen Words", "Bread Loaf", "MacDowell", "Sewanee", "Tin House",
+              "VONA", "Yaddo", "Whiting Foundation", "Civitella Ranieri",
+              "PEN America", "Hedgebrook", "Millay", "Vermont Studio Center")
+
+df_orgs_manual <- data.frame()
+
+for (i in 1:length(org_list))
+{
+  df_3 <- dedup %>% filter(grepl(org_list[i], Text)) %>% select(Author)
+  
+  if (nrow(df_3)>0) {
+    df_3 <- as.data.frame(
+      cbind(entity_1 = as.character(df_3$Author),
+            entity_2 = as.character(rep(org_list[i],length(df_3$Author)))))
+  } else {
+    df_3 <- data.frame()
+  }
+  
+  df_orgs_manual <- rbind(df_orgs_manual, df_3)
+}
+
+df_orgs <- rbind(df_orgs, df_orgs_manual)
+
+# Remove agencies from orgs df. Remove from the list any org entity that is also
+# the writer's agency. (We will add agencies back later.)
+dedup <- dedup %>%
+  mutate(author_agency_concat = paste(Author,Agency))
+
+df_orgs <- df_orgs %>%
+  mutate(author_agency_concat = paste(entity_1,entity_2))
+
+df_orgs <- anti_join(df_orgs, dedup)
+
+# Join all three tables to make one master table:
+# This includes the people table (with agents excluded) and
+# the orgs table (with manual orgs added and agencies stripped out)
+df_total <- rbind(df_people[c("entity_1","entity_2")], 
+                  df_orgs[c("entity_1","entity_2")])
+
+# Remove all duplicate rows (we just want one match per entity pair.)
+df_total <- unique(df_total)
+
+####
+# Make a list of all the entities to include in the network.
+# Remove all rows in which entity_2 is not duplicated (i.e. an entity who was
+# acknowledged by only one writer, in which case we don't consider them a
+# member of the network)
+####
+
+# Make the list: every single entity that appears as a thanker or a thankee
+df_total_e1 <- data.frame(entity = df_total[,"entity_1"])
+df_total_e2 <- data.frame(entity = df_total[,"entity_2"])
+df_total_include <- rbind(df_total_e1, df_total_e2)
+
+df_total_include <- as.vector(
+  df_total_include[df_total_include$entity %in% 
+                     names(which(table(df_total_include$entity) > 1)), ])
+
+# Select only the entity_2s from df_total that are also in the list of 
+# df_total_includes
+df_total <- df_total %>% filter(entity_2 %in% df_total_include)
+
+# Make a data frame with all of the authors + agencies: i.e. add back the
+# agencies to the completed dataset (we treat these differently than other
+# entities, because if a writer is the only entity_1 associated with an agency
+# we still want to include it, i.e. it doesn't need to satisfy the > 1 filter.
+df_agency <- data.frame(entity_1 = dedup[,"Author"],
+                        entity_2 = dedup[,"Agency"])
+
+# Make a data frame with all of the authors + MFA programs: same logic as above
+# TODO(remove the org entities from entity_2 that match the MFA in the remove
+# agencies step)
+df_mfa <- data.frame(entity_1 = dedup[,"Author"],
+                     entity_2 = dedup[,"MFA"])
+
+# Add the agency and MFA data frames to the person / org data frame. (Remember
+# that we are doing this at the end to ensure that when a writer is the only
+# person represented by their agency, the agency still appears in the network.)
+df_total <- rbind(df_total[c("entity_1","entity_2")], 
+                  df_agency[c("entity_1","entity_2")],
+                  df_mfa[c("entity_1","entity_2")]
+                  )
+
+# Manually inspect the data frame in google sheets.
+# write.csv(df_total,"~/Downloads/publishing_data_export.csv")
+# df_total <- read.csv("~/Downloads/publishing data manual cleanup - publishing_data_export.csv")
+
+# Remove rows with empty connections
+df_total <- df_total[df_total$entity_2 != "",]
+```
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r most_thanked_entities, echo=FALSE}
+df_most_thanked_entites <- df_total %>%
+  group_by(entity_2) %>%
+  summarise(cnt = n()) %>%
+  top_n(10)
+
+# Colors for bar chart
+most_thanked_entities_palette <- wes_palette(nrow(df_most_thanked_entites),
+                                             name = "Darjeeling1", 
+                                             type = "continuous")
+
+# Plot
+df_most_thanked_entites %>%
+  ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  scale_fill_manual(values=most_thanked_entities_palette) +
+  theme(legend.position = "none",
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank())
+```
+
+```{r n_entities_thanked, echo = FALSE}
+# Number of entities acknowledged.
+
+df_people_thanked <- as.data.frame(df_people %>% group_by(entity_1) %>% summarise(cnt = n()))
+df_orgs_thanked <- as.data.frame(df_orgs %>% group_by(entity_1) %>% summarise(cnt = n()))
+df_total_thanked <- left_join(df_people_thanked, df_orgs_thanked, by = c("entity_1" = "entity_1")) %>%
+  mutate(total_thanked = cnt.x + cnt.y)
+df_total_thanked[is.na(df_total_thanked)] <- 0
+
+ggplot(df_total_thanked, aes(x=total_thanked)) + 
+  geom_histogram(binwidth=10, fill="#00A08A", color="#e9ecef", alpha=0.9) +
+  theme(legend.position = "none",
+        axis.ticks.x=element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank()) +
+  scale_x_continuous(breaks = seq(0,100, 10))
+```
+
+```{r graph_analysis, echo = FALSE}
+####
+# Generate a directed igraph object in order to calculate the degree for each
+# entity being thanked.
+####
+# Turn data frame into a directed igraph object.
+g_for_deg <- graph_from_data_frame(d=df_total[c("entity_1","entity_2")], directed=T)
+
+# Calculate the degree for each node where the entity is the one being thanked:
+deg <- degree(g_for_deg, mode="in")
+
+####
+# Generate an undirected igraph object to build the network.
+####
+# Turn data frame into an undirected igraph object.
+g <- graph_from_data_frame(d=df_total[c("entity_1","entity_2")], directed=F)
+
+# Assign each entity to a community
+clp <- cluster_label_prop(g)
+```
+
+``` {r forcenetwork, echo = FALSE}
+#Convert igraph object to networkD3 object
+g_d3 <- igraph_to_networkD3(g)
+df_nodes <- g_d3$nodes
+df_links <- g_d3$links
+
+# Add grouping variable to the nodes list
+df_nodes <- df_nodes %>%
+  mutate(group =
+           ifelse(name %in% dedup$Author, "Author",
+                  ifelse(name %in% df_agency$entity_2, "Agency",
+                         ifelse(name %in% df_orgs$entity_2, "Organization",
+                                "Friend"))))
+
+# Make a JS readable color scale to distinguish among the different groups 
+# (based on our Darjeeling1 Wes Anderson palette)
+ColourScale <- 'd3.scaleOrdinal()
+            .domain(["Author", "Agency", "Organization", "Friend"])
+           .range(["#FF0000", "#F2AD00", "#00A08A", "#5BBCD6"]);'
+
+# Add in the degreeness for each entity to determine the bubble size
+df_deg <- tibble::rownames_to_column(data.frame(deg), "name")
+df_nodes <- left_join(df_nodes, df_deg)
+
+# Scale up the degreeness factor so that the circles are bigger and easier to
+# views.
+df_nodes <- df_nodes %>% mutate(deg = deg^3)
+
+# Final force network
+forceNetwork(Links = df_links, Nodes = df_nodes,
+             Source = 'source', 
+             Target = 'target', 
+             NodeID = 'name',
+             Group = 'group',
+             linkColour = "FFFFFF",
+             Nodesize = 3,
+             fontSize=16,
+             legend=T,
+             opacity = .8,
+             bounded = T,
+             opacityNoHover = .5,
+             #charge = -10,
+             colourScale = JS(ColourScale))
+```
