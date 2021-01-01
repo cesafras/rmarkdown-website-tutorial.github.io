@@ -1,5 +1,5 @@
 ---
-title: "Personal Project"
+title: "Get You A Katie: An Analysis of Debut Novel Acknowledgements"
 output: html_document
 ---
 
@@ -14,13 +14,39 @@ library(dplyr)
 library(igraph)
 library(networkD3)
 library(knitr)
+library(data.table)
 ```
 
-## R Markdown
+## What is this?
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+One of the most oft repeated pieces of advice for aspiring writers looking for
+literary agents is to look at the acknowledgements section of novels to see
+which literary agents represent the writers they admire. From there, the advice
+goes, just query those agents and, with a bit of work and kismit, one day 
+*you'll* be the published author whose acknowledgements people are trolling.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Okay, then!
+
+The rest of this analysis is me taking that advice... too far? Sure I could have
+read the acknowledgements, made my list of literary agents and gone about my
+business, but I had more questions. And when I have questions, I do stuff with
+data. (I am a novelist cum data scientist, if you recall.) 
+
+I created a dataset consisting of all of the debut authors that had been
+nominated for the Center for Fiction First Novel Prize in the past three years
+(2020, 2019, 2018) and did some analysis, based on... you guessed it, the
+contents of their acknowledgements. In a perfect world, I could do this for
+every single debut author, ever, but in practice I needed to limit the size of
+the dataset and chose this particular group of ~80 writers because it seemed
+like a somewhat representative cohort of fiction that I enjoy and that have also
+enjoyed some level of acclaim (owing to the prize nomination and all.) Why debut
+novelists you ask? Well, one, because that's what I'm working toward. But two,
+technically speaking, it meant that writers would not be duplicated in the
+dataset year over year (because, you're only a debut novelist once.) How
+elegant!
+
+Below, I'm dropping that knowledge, for the whole world (i.e. other people 
+writing literary fiction and looking for agents) to enjoy.
 
 ```{r palettes, echo=FALSE}
 # Color palettes: for this analysis we use Darjeeling1
@@ -287,23 +313,45 @@ df_total <- rbind(df_total[c("entity_1","entity_2")],
 # Remove rows with empty connections
 df_total <- df_total[df_total$entity_2 != "",]
 ```
-## Including Plots
+> Who's getting shoutouts? (aka: get you a Katie!)
 
-You can also embed plots, for example:
+There are a few different types of entities that writers typically acknowledge:
+
+* agents / agencies
+* editors / publishing houses
+* MFA programs
+* Workshops / retreats / foundations
+* Friends and family
+
+For the purposes of this analysis I've organized these entities into three 
+broader categories: agencies, organizations, and individuals. The charts below highlight the entities (agencies, organizations, and individuals) that were
+shouted out the most by the debut authors.
+
+If we look across all entities we see a mix of agencies and organizations on the
+leaderboard. You'll notice only one individual make the top ten overall list.
+That individual is none other than... **Katie!** 
+
+(I found it amusing that 1 out of every 7 debut authors acknowledged someone
+named Katie... I know, I know, there are lots of Katies out there supporting the arts, but... it's really hard to get into Bread Loaf or Tin House. Finding a
+Katie to stan my work, though? Feels more doable.)
 
 ```{r most_thanked_entities, echo=FALSE}
-df_most_thanked_entites <- df_total %>%
+df_most_thanked_entities <- df_total %>%
   group_by(entity_2) %>%
   summarise(cnt = n()) %>%
   top_n(10)
 
+# Cheat a little bit and add all the Katies (or whatever the modal name is)
+df_most_thanked_entities[df_most_thanked_entities$entity_2 == modal_name,]$cnt <-
+  length(unique(df_people[df_people$entity_2 %like% modal_name,"entity_1"]))
+
 # Colors for bar chart
-most_thanked_entities_palette <- wes_palette(nrow(df_most_thanked_entites),
+most_thanked_entities_palette <- wes_palette(nrow(df_most_thanked_entities),
                                              name = "Darjeeling1", 
                                              type = "continuous")
 
 # Plot
-df_most_thanked_entites %>%
+df_most_thanked_entities %>%
   ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -319,8 +367,94 @@ df_most_thanked_entites %>%
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
         panel.border = element_blank(),
-        axis.line = element_blank())
+        axis.line = element_blank())+
+  ggtitle("Most acknowledged entities overall")
 ```
+
+``` {r most_thanked_agencies, echo = FALSE}
+df_most_thanked_agencies <- df_total %>%
+  filter(entity_2 %in% df_agency$entity_2) %>%
+  group_by(entity_2) %>%
+  summarise(cnt = n()) %>%
+  top_n(10)
+
+# Colors for bar chart
+most_thanked_agencies_palette <- wes_palette(nrow(df_most_thanked_agencies), 
+                                            name = "Darjeeling1", 
+                                            type = "continuous")
+
+# Plot
+df_most_thanked_agencies %>%
+  ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  scale_fill_manual(values=most_thanked_agencies_palette) +
+  theme(legend.position = "none",
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank()) +
+  ggtitle("Most acknowledged agencies")
+```
+
+``` {r most_thanked_individuals, echo = FALSE}
+df_most_thanked_persons <- df_total %>%
+  filter(entity_2 %in% df_people$entity_2 
+         & !(entity_2 %in% df_orgs$entity_2)
+         & !(entity_2 %in% df_orgs_manual$entity_2)
+         & !(entity_2 %in% df_agency$entity_2)) %>%
+  group_by(entity_2) %>%
+  summarise(cnt = n()) %>%
+  top_n(10)
+
+# Colors for bar chart
+most_thanked_persons_palette <- wes_palette(nrow(df_most_thanked_persons), 
+                                            name = "Darjeeling1", 
+                                            type = "continuous")
+
+# Plot
+df_most_thanked_persons %>%
+  ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  scale_fill_manual(values=most_thanked_persons_palette) +
+  theme(legend.position = "none",
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank()) +
+  ggtitle("Most acknowledged individuals")
+```
+
+> How many people does it take to write a novel? (spoiler: a small to medium
+sized village)
+
+We looked at who's getting shoutouts, now let's look at how many shoutouts our
+debut authors are giving. Below is the distribution of the number of entities
+thanked across all of our authors. So how big a village does it take to write a
+novel?
+
+**The short answer? 30.**
+
+Most debut novelists acknowledge 29 people or more -- call it 30 if we include
+the author who... probably did the most work?
+
+The minimum number of entities acknowledged is... 0. (Whomp whomp whomp.) And
+the maximum is a much more bustling village of 88.
 
 ```{r n_entities_thanked, echo = FALSE}
 # Number of entities acknowledged.
@@ -344,7 +478,8 @@ ggplot(df_total_thanked, aes(x=total_thanked)) +
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  scale_x_continuous(breaks = seq(0,100, 10))
+  scale_x_continuous(breaks = seq(0,100, 10)) +
+  ggtitle("Distibution of number of entities acknowledged")
 ```
 
 ```{r graph_analysis, echo = FALSE}
@@ -368,6 +503,59 @@ g <- graph_from_data_frame(d=df_total[c("entity_1","entity_2")], directed=F)
 clp <- cluster_label_prop(g)
 ```
 
+> But, like, do they all have fancy MFAs and exclusive residencies? Are all
+these award winning debut novelists best friends? Because it kind of seems like
+they are on Twitter...
+
+This was the question that was really gnawing at me when I started this whole
+exercise. As a fairly avid reader of novel acknowledgements I see the same
+names over and over again, which leads me to believe that novel publishing is a
+super exclusive closed circuit that no mere mortal can simply enter at will. But
+then again... I do have an active imagination (I am writer after all!) so I
+wanted to put my intuition to the test.
+
+To do that I created a social graph based on the debut novelist's
+acknowledgements section. I used a natural language processing model to extract
+all of the named entities from the text of each author's acknowledgements. There
+are two major limitations with this approach which I will call out now:
+
+* Just because someone isn't acknowledged by a writer doesn't mean that person
+isn't in that writer's social network.
+* Our natural language processing model isn't perfect so sometimes it
+  + Miscategorizes entities (e.g. assumes Sewanee is a place not an organization)
+  + Doesn't fully recognize entities (e.g. Iowa is distinct from University of
+  Iowa)
+  
+The second problem is easier to address than the first, so I did try to clean 
+the data manually a bit, but it probably still isn't perfect. (e.g. Curtis Brown
+is actually an organization but may be labeled as an individual.) But I think
+it's good enough for government work. The first problem is kind of a
+philosophical one and I'm just going to assert here that if a writer didn't
+acknowledge an entity in the approximately 2,500 words the average author 
+allocated to their acknowledgements that entity is not in that writer's inner
+circle.
+
+Now onto the graph.
+
+It's color coded based on whether the entity is a:
+
+* debut author
+* agency
+* other organization (e.g. workshop, residency, MFA program)
+* an individual / friend
+
+The bigger the bubble and the more central the bubble is in the chart the 
+more important that bubble is to the social network. So the biggest bubble 
+(Bread Loaf) represents the node in the network that is most central.
+
+You can click on the bubbles to see what other entities they are connected to.
+You can also drag the bubbles around to see what amount of force they exert on
+the network. (The more the network moves with the bubble, the bigger its
+influence.)
+
+#### Social network of 80 award nominated debut authors
+
+
 ``` {r forcenetwork, echo = FALSE}
 #Convert igraph object to networkD3 object
 g_d3 <- igraph_to_networkD3(g)
@@ -377,15 +565,15 @@ df_links <- g_d3$links
 # Add grouping variable to the nodes list
 df_nodes <- df_nodes %>%
   mutate(group =
-           ifelse(name %in% dedup$Author, "Author",
+           ifelse(name %in% dedup$Author, "Debut Author",
                   ifelse(name %in% df_agency$entity_2, "Agency",
                          ifelse(name %in% df_orgs$entity_2, "Organization",
-                                "Friend"))))
+                                "Individual"))))
 
 # Make a JS readable color scale to distinguish among the different groups 
 # (based on our Darjeeling1 Wes Anderson palette)
 ColourScale <- 'd3.scaleOrdinal()
-            .domain(["Author", "Agency", "Organization", "Friend"])
+            .domain(["Debut Author", "Agency", "Organization", "Individual"])
            .range(["#FF0000", "#F2AD00", "#00A08A", "#5BBCD6"]);'
 
 # Add in the degreeness for each entity to determine the bubble size

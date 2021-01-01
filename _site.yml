@@ -4,6 +4,8 @@ navbar:
   left:
     - text: "Get You A Katie: An Analysis of Debut Novel Acknowledgements"
       href: first_observations.html
+    - text: "Everything's Fine: My Debut Novel"
+      href: basic_workflow.html
 output_dir: "."
 output:
   html_document:
