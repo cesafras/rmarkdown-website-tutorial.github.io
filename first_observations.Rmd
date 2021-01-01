@@ -479,7 +479,7 @@ ggplot(df_total_thanked, aes(x=total_thanked)) +
         panel.border = element_blank(),
         axis.line = element_blank()) +
   scale_x_continuous(breaks = seq(0,100, 10)) +
-  ggtitle("Distibution of number of entities acknowledged")
+  ggtitle("Distribution of number of entities acknowledged")
 ```
 
 ```{r graph_analysis, echo = FALSE}
@@ -553,8 +553,7 @@ You can also drag the bubbles around to see what amount of force they exert on
 the network. (The more the network moves with the bubble, the bigger its
 influence.)
 
-#### Social network of 80 award nominated debut authors
-
+**Social network of 80 award nominated debut authors**
 
 ``` {r forcenetwork, echo = FALSE}
 #Convert igraph object to networkD3 object
