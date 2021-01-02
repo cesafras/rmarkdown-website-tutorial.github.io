@@ -1,5 +1,5 @@
 ---
-title: "Get You A Katie: An Analysis of Debut Novel Acknowledgements"
+title: "GET YOU A KATIE"
 output: html_document
 ---
 
