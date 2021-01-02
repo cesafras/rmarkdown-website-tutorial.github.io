@@ -15,6 +15,9 @@ library(igraph)
 library(networkD3)
 library(knitr)
 library(data.table)
+library(egg)
+library(gridExtra)
+library(ggpubr)
 ```
 
 ## What is this?
@@ -335,11 +338,11 @@ That individual is none other than... **Katie!**
 named Katie... I know, I know, there are lots of Katies out there supporting the arts, but... it's really hard to get into Bread Loaf or Tin House. Finding a
 Katie to stan my work, though? Feels more doable.)
 
-```{r most_thanked_entities, echo=FALSE}
+```{r most_thanked, include = FALSE}
 df_most_thanked_entities <- df_total %>%
   group_by(entity_2) %>%
   summarise(cnt = n()) %>%
-  top_n(10)
+  top_n(20)
 
 # Cheat a little bit and add all the Katies (or whatever the modal name is)
 df_most_thanked_entities[df_most_thanked_entities$entity_2 == modal_name,]$cnt <-
@@ -351,7 +354,7 @@ most_thanked_entities_palette <- wes_palette(nrow(df_most_thanked_entities),
                                              type = "continuous")
 
 # Plot
-df_most_thanked_entities %>%
+p1 <- df_most_thanked_entities %>%
   ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -367,11 +370,9 @@ df_most_thanked_entities %>%
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
         panel.border = element_blank(),
-        axis.line = element_blank())+
-  ggtitle("Most acknowledged entities overall")
-```
+        axis.line = element_blank()) +
+  labs(subtitle="Overall")
 
-``` {r most_thanked_agencies, echo = FALSE}
 df_most_thanked_agencies <- df_total %>%
   filter(entity_2 %in% df_agency$entity_2) %>%
   group_by(entity_2) %>%
@@ -380,11 +381,11 @@ df_most_thanked_agencies <- df_total %>%
 
 # Colors for bar chart
 most_thanked_agencies_palette <- wes_palette(nrow(df_most_thanked_agencies), 
-                                            name = "Darjeeling1", 
-                                            type = "continuous")
+                                             name = "Darjeeling1", 
+                                             type = "continuous")
 
 # Plot
-df_most_thanked_agencies %>%
+p2 <- df_most_thanked_agencies %>%
   ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -401,10 +402,8 @@ df_most_thanked_agencies %>%
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  ggtitle("Most acknowledged agencies")
-```
+  labs(subtitle="Agencies")
 
-``` {r most_thanked_individuals, echo = FALSE}
 df_most_thanked_persons <- df_total %>%
   filter(entity_2 %in% df_people$entity_2 
          & !(entity_2 %in% df_orgs$entity_2)
@@ -414,13 +413,24 @@ df_most_thanked_persons <- df_total %>%
   summarise(cnt = n()) %>%
   top_n(10)
 
+# Do the modal name fix
+# Cheat a little again to make sure that first, last modal names get counted with
+# first only modal names
+# Calculate total number of modal names (done already)
+# Remove all modal names from the df
+# Add a new modal name row with the total modal names
+#df_most_thanked_persons[!(df_most_thanked_persons$entity_2 %like% modal_name),]
+#df_most_thanked_persons <- rbind(df_most_thanked_persons, 
+#                                 data.frame(entity_2 = modal_name,  cnt =
+#  length(unique(df_people[df_people$entity_2 %like% modal_name,"entity_1"]))))
+
 # Colors for bar chart
 most_thanked_persons_palette <- wes_palette(nrow(df_most_thanked_persons), 
                                             name = "Darjeeling1", 
                                             type = "continuous")
 
 # Plot
-df_most_thanked_persons %>%
+p3 <- df_most_thanked_persons %>%
   ggplot(aes(x = reorder(entity_2, cnt), y = cnt, fill = entity_2, label = cnt)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -437,7 +447,18 @@ df_most_thanked_persons %>%
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  ggtitle("Most acknowledged individuals")
+  labs(subtitle="Individuals")
+
+p4 <- egg::ggarrange(p2,p3, ncol = 1, heights=c(
+  nrow(df_most_thanked_agencies),
+  nrow(df_most_thanked_persons)))
+```
+
+**Most acknowledged:**
+
+``` {r acknowledgement_plots, echo = FALSE}
+#title1=text_grob("Most acknowledged:", size = 15, face = "bold", x = 0, hjust = 0)
+grid.arrange(p1, p4, ncol=2)#, top=title1)
 ```
 
 > How many people does it take to write a novel? (spoiler: a small to medium
@@ -448,7 +469,7 @@ debut authors are giving. Below is the distribution of the number of entities
 thanked across all of our authors. So how big a village does it take to write a
 novel?
 
-**The short answer? 30.**
+The short answer? 30.
 
 Most debut novelists acknowledge 29 people or more -- call it 30 if we include
 the author who... probably did the most work?
@@ -456,16 +477,17 @@ the author who... probably did the most work?
 The minimum number of entities acknowledged is... 0. (Whomp whomp whomp.) And
 the maximum is a much more bustling village of 88.
 
-```{r n_entities_thanked, echo = FALSE}
-# Number of entities acknowledged.
+**Distribution of number and length of acknowledgements:**
 
+```{r n_entities_thanked, ,fig.height=3, fig.width=5, echo = FALSE}
+# Number of entities acknowledged.
 df_people_thanked <- as.data.frame(df_people %>% group_by(entity_1) %>% summarise(cnt = n()))
 df_orgs_thanked <- as.data.frame(df_orgs %>% group_by(entity_1) %>% summarise(cnt = n()))
 df_total_thanked <- left_join(df_people_thanked, df_orgs_thanked, by = c("entity_1" = "entity_1")) %>%
   mutate(total_thanked = cnt.x + cnt.y)
 df_total_thanked[is.na(df_total_thanked)] <- 0
 
-ggplot(df_total_thanked, aes(x=total_thanked)) + 
+p5 <- ggplot(df_total_thanked, aes(x=total_thanked)) + 
   geom_histogram(binwidth=10, fill="#00A08A", color="#e9ecef", alpha=0.9) +
   theme(legend.position = "none",
         axis.ticks.x=element_blank(),
@@ -478,8 +500,27 @@ ggplot(df_total_thanked, aes(x=total_thanked)) +
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  scale_x_continuous(breaks = seq(0,100, 10)) +
-  ggtitle("Distribution of number of entities acknowledged")
+  scale_x_continuous(breaks = seq(0,90, 10)) +
+  labs(subtitle = "Number of Acknowledgements")
+
+# Number of words in the acknowledgements.
+p6 <- ggplot(dedup, aes(x=Word.count)) + 
+  geom_histogram(binwidth=1000,fill="#00A08A", color="#e9ecef", alpha=0.9) +
+  theme(legend.position = "none",
+        axis.ticks.x=element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.title.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        axis.line = element_blank()) +
+  scale_x_continuous(breaks = seq(0, 9000, 1000)) +
+  labs(subtitle = "Word Count of Acknowledgements")
+
+ggarrange(p5, p6, ncol = 1)
 ```
 
 ```{r graph_analysis, echo = FALSE}
@@ -553,9 +594,9 @@ You can also drag the bubbles around to see what amount of force they exert on
 the network. (The more the network moves with the bubble, the bigger its
 influence.)
 
-**Social network of 80 award nominated debut authors**
+**Social network of 80 award nominated debut authors:**
 
-``` {r forcenetwork, echo = FALSE}
+``` {r forcenetwork, out.width="100%", out.height="800px", echo = FALSE}
 #Convert igraph object to networkD3 object
 g_d3 <- igraph_to_networkD3(g)
 df_nodes <- g_d3$nodes
@@ -594,8 +635,8 @@ forceNetwork(Links = df_links, Nodes = df_nodes,
              fontSize=16,
              legend=T,
              opacity = .8,
-             bounded = T,
-             opacityNoHover = .5,
+             bounded = F,
+             opacityNoHover = .4,
              #charge = -10,
              colourScale = JS(ColourScale))
 ```
