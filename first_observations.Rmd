@@ -543,6 +543,8 @@ g <- graph_from_data_frame(d=df_total[c("entity_1","entity_2")], directed=F)
 
 # Assign each entity to a community
 clp <- cluster_label_prop(g)
+#https://igraph.org/r/doc/cluster_edge_betweenness.html
+ceg <- cluster_edge_betweenness(g)
 ```
 
 > But, like, do they all have fancy MFAs and exclusive residencies? Are all
@@ -661,7 +663,8 @@ represent the influence of the entity.
 ``` {r treemap_prep, echo = FALSE}
 # Create a new data frame with all of the nodes plus the community they belon
 # to
-df_nodes_tm <- cbind(df_nodes, data.frame(community = clp$membership))
+#df_nodes_tm <- cbind(df_nodes, data.frame(community = clp$membership))
+df_nodes_tm <- cbind(df_nodes, data.frame(community = ceg$membership))
 df_nodes_tm <- df_nodes_tm[,c("name","group","deg","community")]
 # Rename the columns so that they match the js requirement for highcharter
 names(df_nodes_tm) <- c("name", "group", "value", "parent")
@@ -699,7 +702,7 @@ highcharter::highchart() %>%
     allowDrillToNode = TRUE,
     tooltip = list(pointFormat = "Name: {point.name} 
                    <br/>Degree: {point.value}
-                   <br/>Group: {point.group}"),
+                   <br/>Community: {point.parent}"),
     levels = list(
       list(
         level = 1,
