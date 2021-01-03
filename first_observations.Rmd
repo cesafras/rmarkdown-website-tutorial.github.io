@@ -18,6 +18,7 @@ library(data.table)
 library(egg)
 library(gridExtra)
 library(ggpubr)
+library(highcharter)
 ```
 
 ## What is this?
@@ -639,4 +640,80 @@ forceNetwork(Links = df_links, Nodes = df_nodes,
              opacityNoHover = .4,
              #charge = -10,
              colourScale = JS(ColourScale))
+```
+
+> Cool bubbles bro, but can we actually make sense of the social graph?
+
+The treemap below segments each of the entities into different communities. The
+communities are based on propagating labels, which is a fast, nearly linear time
+algorithm for detecting community structure in networks. In works by labeling
+the vertices with unique labels and then updating the labels by majority voting
+in the neighborhood of the vertex.
+
+In other words, the communities represent the entities that are in the same
+"neighborhood." From this we can start to understand the social networks within
+the network.
+
+Click on a community to take a closer look at the other entities in their
+community. As with the social graph, the sizes of each quadrilateral in the map
+represent the influence of the entity.
+
+``` {r treemap_prep, echo = FALSE}
+# Create a new data frame with all of the nodes plus the community they belon
+# to
+df_nodes_tm <- cbind(df_nodes, data.frame(community = clp$membership))
+df_nodes_tm <- df_nodes_tm[,c("name","group","deg","community")]
+# Rename the columns so that they match the js requirement for highcharter
+names(df_nodes_tm) <- c("name", "group", "value", "parent")
+#Reorder just in case that's what's causing the error
+df_nodes_tm <- df_nodes_tm[c("name", "parent", "value", "group")]
+# Make everything except the value a character
+df_nodes_tm$parent <- as.character(df_nodes_tm$parent)
+# Make the df into a list
+df_nodes_list <- lapply(split(df_nodes_tm,df_nodes_tm$name), function(x) as.list(x))
+# Make a parent list (just convert a data frame into a list to make life easier)
+df_nodes_parent <- data.frame(id = unique(df_nodes_tm$parent),
+                   name = unique(df_nodes_tm$parent),
+                   color = as.vector(wes_palette(length(unique(df_nodes_tm$parent)),
+                                                         name = "Darjeeling1", 
+                                                         type = "continuous")))
+# Make everything a character
+df_nodes_parent$name <- as.character(df_nodes_parent$name)
+df_nodes_parent$id <- as.character(df_nodes_parent$id)
+df_nodes_parent$color <- as.character(df_nodes_parent$color)
+
+# Make a parent list and join it to the rest of the nodes list
+df_nodes_parent_list <- lapply(split(df_nodes_parent,df_nodes_parent$id), function(x) as.list(x))
+df_nodes_list <- c(df_nodes_parent_list, df_nodes_list)
+
+# Unname the list FOR SOME REASON WITH NAMES YOU GET A BIG ERROR (DOH!)
+df_nodes_list <- unname(df_nodes_list)
+```
+
+**Treemap of 80 debut authors and their social networks:**
+``` {r treemap_visual, out.width="100%", out.height="800px", echo = FALSE}
+highcharter::highchart() %>% 
+  highcharter::hc_add_series(
+    type = "treemap",
+    layoutAlgorithm = "squarified",
+    allowDrillToNode = TRUE,
+    tooltip = list(pointFormat = "Name: {point.name} 
+                   <br/>Degree: {point.value}
+                   <br/>Group: {point.group}"),
+    levels = list(
+      list(
+        level = 1,
+        dataLabels = list(
+          enabled = FALSE
+        )
+      ),
+      list(
+        level = 2,
+        dataLabels = list(
+          enabled = TRUE
+        )
+      )
+    ),
+    data = df_nodes_list
+  )
 ```
