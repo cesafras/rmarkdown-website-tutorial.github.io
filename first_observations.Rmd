@@ -343,7 +343,7 @@ Katie to stan my work, though? Feels more doable.)
 df_most_thanked_entities <- df_total %>%
   group_by(entity_2) %>%
   summarise(cnt = n()) %>%
-  top_n(20)
+  top_n(10)
 
 # Cheat a little bit and add all the Katies (or whatever the modal name is)
 df_most_thanked_entities[df_most_thanked_entities$entity_2 == modal_name,]$cnt <-
@@ -469,8 +469,6 @@ We looked at who's getting shoutouts, now let's look at how many shoutouts our
 debut authors are giving. Below is the distribution of the number of entities
 thanked across all of our authors. So how big a village does it take to write a
 novel?
-
-The short answer? 30.
 
 Most debut novelists acknowledge 29 people or more -- call it 30 if we include
 the author who... probably did the most work?
@@ -720,3 +718,4 @@ highcharter::highchart() %>%
     data = df_nodes_list
   )
 ```
+
