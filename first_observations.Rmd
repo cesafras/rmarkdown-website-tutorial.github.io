@@ -19,9 +19,14 @@ library(egg)
 library(gridExtra)
 library(ggpubr)
 library(highcharter)
+library(plotly)
+library(htmlwidgets)
+library(tweetrmd)
+library(webshot2)
+library(emo)
 ```
 
-## What is this?
+### **What is this?**
 
 One of the most oft repeated pieces of advice for aspiring writers looking for
 literary agents is to look at the acknowledgements section of novels to see
@@ -50,7 +55,12 @@ dataset year over year (because, you're only a debut novelist once.) How
 elegant!
 
 Below, I'm dropping that knowledge, for the whole world (i.e. other people 
-writing literary fiction and looking for agents) to enjoy.
+writing literary fiction and looking for agents) to enjoy. Answers to all your
+most burning questions below, e.g.:
+
+* Who should my agent be?
+* What MFAs/workshops/residencies should I apply to?
+* Is Alexander Chee really the most beloved writer in America?
 
 ```{r palettes, echo=FALSE}
 # Color palettes: for this analysis we use Darjeeling1
@@ -317,7 +327,7 @@ df_total <- rbind(df_total[c("entity_1","entity_2")],
 # Remove rows with empty connections
 df_total <- df_total[df_total$entity_2 != "",]
 ```
-> Who's getting shoutouts? (aka: get you a Katie!)
+> Who's in the acknowledgements?
 
 There are a few different types of entities that writers typically acknowledge:
 
@@ -335,9 +345,18 @@ If we look across all entities we see a mix of agencies and organizations on the
 leaderboard. You'll notice only one individual make the top ten overall list.
 That individual is none other than... **Katie!** 
 
-(I found it amusing that 1 out of every 7 debut authors acknowledged someone
-named Katie... I know, I know, there are lots of Katies out there supporting the arts, but... it's really hard to get into Bread Loaf or Tin House. Finding a
-Katie to stan my work, though? Feels more doable.)
+I know, I know, there are lots of Katies out there supporting the arts, but... it's really hard to get into Bread Loaf or Tin House. Finding a Katie to stan my work, though? Feels more doable.
+
+*On a related note, now feels like a good time to mention that this analysis was
+heavily inspired by Richard Jean Ho's work on race in publishing. I've always
+dreamed of the day that someone would successfully "Moneyball literature" and while
+that's not exactly what he's doing, I really admire the use of data and analytics
+to understand books and book publishing. Although my analysis does not directly
+deal with race, some of my conclusions are related. Namely that the social
+networks that award nominated writers navigate are quite compact (more on that
+below) and—related to the Katie point—succeeding in the literary fiction game
+requires the support of white people and institutions. (80% of people named Katie
+are white, and 80% of agents and editors are white.)*
 
 ```{r most_thanked, include = FALSE}
 df_most_thanked_entities <- df_total %>%
@@ -462,8 +481,7 @@ p4 <- egg::ggarrange(p2,p3, ncol = 1, heights=c(
 grid.arrange(p1, p4, ncol=2)#, top=title1)
 ```
 
-> How many people does it take to write a novel? (spoiler: a small to medium
-sized village)
+> How many people does it take to write a novel?
 
 We looked at who's getting shoutouts, now let's look at how many shoutouts our
 debut authors are giving. Below is the distribution of the number of entities
@@ -595,6 +613,11 @@ You can also drag the bubbles around to see what amount of force they exert on
 the network. (The more the network moves with the bubble, the bigger its
 influence.)
 
+*Note: I did not check my work, however I did watch a conversation between Lucy
+Tan and Susie Yang hosted by everyone's favorite Brooklyn bookstore Books Are
+Magic in which they revealed a long-standing friendship, so the fact that they
+show up so close together in the graph is... super vindicating.*
+
 **Social network of 80 award nominated debut authors:**
 
 ``` {r forcenetwork, out.width="100%", out.height="800px", echo = FALSE}
@@ -719,3 +742,290 @@ highcharter::highchart() %>%
   )
 ```
 
+**Breaking it down: the 8 types of writing communities**
+
+## <span style="color: #CC201B;">The Road Not Taken</span>
+
+*Two roads diverged in a wood, and I— I took the one less traveled by, And that
+has made all the difference.<br/>—Robert Frost*
+
+**Member Entities**: Bread Loaf, HG Literary, New York Foundation for the Arts, Hunter
+College, David Shulman, Lisa Keim, Peter Carey, Sean McDonald, Levine Greenberg
+Rostan
+
+It's with some irony that I've labeled this community after that famous Robert
+Frost poem. First, because the entity with the most influence in this community
+is Bread Loaf, which is also the entity with the most influence across the
+entire social network, and therefore probably better described as the road
+*taken.* However, for you literature buffs out there, you know that Frost's
+poem is famously misinterpreted (it's not strictly about 'doing your own thang')
+and so I thought this would be an appropriate twist. Oh yeah, also (according
+to Wikipedia) Bread Loaf's inception was closely associated with Robert Frost
+who lived nearby and attended a total of 29 sessions.
+
+## <span style="color: #FF0000;">The Marriage Plot</span>
+
+*To start with, look at all the books.<br/>—Jeffrey Eugenides*
+
+**Member Entities**: Tin House, Sewanee, Rebecca Makkai, William Morris Endeavor, Aevitas Creative Management, Darin Straus, Jeffrey Eugenides, Jill Bialowsky, 
+Nicholas Latimer, Julia Phillips, Norton
+
+Obviously Jeffrey Eugenides (author of The Marriage Plot) is in the community. 
+But a "marriage plot" also refers to a novel form popularized by such illustrious
+names in English literature as Jane Austen, George Eliot and the Bronte sisters.
+Seemed mostly fitting for a community comprised of literary stalwarts like Tin
+House, Sewanee and WME.
+
+## <span style="color: #1C8E7A;">Lan Samantha Chang stans</span>
+
+*[Poets] are the canaries in the mineshaft of our existence.<br/>—Lan Samantha 
+Chang*
+
+**Member Entities**: University of Iowa, Ethan Canin, Lan Samantha Chang,
+DeFiore and Company, Marilynne Robinson, Molly Stern, Rachel Rokicki, Amanda
+Dennis, Charlie D'Ambrosio, Mia Bailey, Drew Calvert, Noel Carver
+
+Okay, so technically this is the "Iowa" community, but I couldn't resist a plug
+for Sam Chang, who I was lucky enough to meet in a workshop last summer, and who
+is just the bees knees. Is anyone surprised that the most renowned creative
+writing program in the country is run by someone everyone loves?
+
+## <span style="color: #8D473D;">MFA + NYC</span>
+
+*The MFA has many detractors, and many of them greatly overstate their case, 
+harking back to a time when every writer was a wine-chugging Hemingway firing a 
+homemade rifle at a rabid shark from the back of a speeding ambulance.<br/>—Chad 
+Harbach*
+
+**Member Entities**: Columbia University, ICM, Katie, Hedgebrook, Curtis Brown, John
+Freeman, Luis Alberto Urrea, Rona Jaffe Foundation, VONA, Dennis Norris II,
+Georges Borschardt, Helen Garnons-Williams, Jessica Williams
+
+There's an ongoing debate in the literary community: MFA or NYC. In other words,
+where should a writer cut their teeth. The consensus turns out to be: both. And
+the beauty of this community is that the big boy at the center (Columbia
+University) is both MFA and NYC. Who said writers can't have it all!
+
+## <span style="color: #50A45C;">Alexander Chee and Artists' Colonies</span>
+
+*...the only things you must have to become a writer are the stamina to continue and a wily, cagey heart in the face of extremity, failure and success.<br/>—Alexander Chee*
+
+**Member Entities**: MacDowell, Alexander Chee, Aragi, Inc., Trident Media Group, Yaddo, Andra Miller, NYU, Michelle Koufopolous, University of New Mexico
+
+If you spend like five seconds on literary Twitter you will encounter this name:
+Alexander Chee. Seriously, from where I sit, he seems like the Tom Cruise (Harry
+Styles? I don't celebrities) of the literary community. He's a BIG DEAL. So are
+certain artists' colonies, like MacDowell and Yaddo, which you can read about,
+but are basically cabin in the woods type situations where only the best, most
+talented writers are invited to stay and take their lunch in hand-delivered
+picnic baskets.
+
+## <span style="color: #F69100;">That National Book Award Energy</span>
+
+*Books matter.<br/>—Lisa Lucas*
+
+**Member Entities**: Janklow & Nesbit, Vermont Studio Center, Center for Fiction, Chris Jackson, Megan Lynch, Michael Taeckens, Rachel Kushner, Writers House, School of the Art Institute of Chicago, University of New Orleans
+
+As a lay person I couldn't immediately come up with a unifying theory for this
+community so I did a bit of Googling. Something seemed to unite many of them
+(i.e. was in their bios and on their home pages) was the National Book Award. Be
+friends with these people if you want to win the big one!
+
+## <span style="color: #F3A300;">Random House</span>
+
+*If there is a book that you want to read, but it hasn't been written yet, you must be the one to write it.<br/>—Toni Morrison*
+
+**Member Entities**: Random House, Susan Kamil, Andrea Walker, Andy Ward, Avideh Bashirrad, Emma Caruso, Leigh Merchant, Toni Morrison
+
+I could have come up with a cute label for this community, but didn't. This is
+Random House and friends, including Toni Morrison, who is one of the greats, and
+who will no doubt still be getting shout outs long, long after she's gone.
+
+## <span style="color: #32806E;">Maxwell Perkins, etc.</span>
+
+*Your manuscript is both good and original, but the part that is good is not original, and the part that is original is not good.<br/>–Samuel Johnson*
+
+**Member Entities**: Cal Morgan, The Clegg Agency, Deb Seager, Katie Raissian, James Nolan, Morgan Entrekin, Judy Hottensen, University of Texas, George Mason University, The Cheney Agency
+
+So the energy in this community leaned editorial, hence the nod to Maxwell
+Perkins, the most famous editor of all time. Supposedly he discovered Hemingway,
+Fitzgerald and Wolfe, which is quite a contribution to American letters. (He
+probably spent a lot of time in bars. Lol, jk.)
+
+```{r tweet-from-dsquintana}
+#tweet_screenshot(
+#  tweet_url("alexpghayes", "1211748406730706944")
+#)
+
+#include_tweet("https://twitter.com/dsquintana/status/1275705042385940480")
+```
+
+> So... which agency?
+
+If you recall, the genesis of this entire project was hunting for literary
+agents in the acknowledgements section of debut novels. After all of this, a
+reasonable person might wonder: did you pick an agent? Essentially, yes. For the
+purposes of this analysis I looked at agencies not individual agents, because
+they were easier to keep track of. (If I were doing this for real, I'd certainly
+want to look at individual agents, but that's for another day.)
+
+How did I decide? Check out the chart below. I made a scatter plot comparing the
+total number of award nominated debut authors represented by the agency compared
+to the "centrality" score for the agency (i.e. the measure of influence of the
+agency.) Representing more authors is obviously a good sign (although it could
+equally be a sign that the agency itself represents more authors overall, aka is
+big), but for me personally, I thought that being less central / influential
+would also be a positive. As in, the less central the agency was (the less in
+the "scene" it was) the more likely it would be to represent someone such as
+myself, i.e. a random person who is decidedly not in the "scene."
+
+So here's what I did. I added a regression line, with error bounds to a
+scatter plot of # authors vs centrality score. The regression line (the blue
+line) tells us that the more central the agency is the more award winning
+debut authors it represents (or vice versa, the more award winning debut authors
+the agency represents the more central it is.) This is intuitive! But where
+things get interesting is when we look at agencies outside of the boundary.
+Agencies below the boundary are more central than the number of award winning
+debut authors. In other words, given how influential they are we would expect
+them to represent more of these debut authors. Agencies above the boundary on 
+the other hand represent more authors than you would expect given how central
+they are. Which means? These agencies (HG Literary, DeFiore and Company and ICM)
+are disproportionately good at picking random, talented writers to represent (of
+which I consider myself one.)
+
+Hover over the point to reveal the name of the agency. The agencies that are
+labeled are the ones that seem to be successfully taking chances on "unknown
+kids," so to speak.
+
+**Scatterplot of agencies by # of authors represented vs centrality score:**
+``` {r agent_selection, echo = FALSE}
+# Calculate a centrality score for each entity.
+ec <- eigen_centrality(g)
+#ec$vector
+
+# Create a data frame with just the agencies including their centrality scores.
+agency_chart <- cbind(df_nodes, cen = ec$vector)
+agency_chart <- agency_chart[agency_chart$group == "Agency",]
+
+# Count the number of authors that each agency represents.
+agency_reps <- dedup %>%
+  group_by(Agency) %>%
+  summarise(cnt = n())
+
+# Create a df for a scatter plot of number of authors repped and centrality.
+agency_scatter <- left_join(agency_chart, agency_reps, by = c("name" = "Agency"))
+
+#agency_scatter$cen_log <- log(agency_scatter$cen)
+
+# Plot the scatter.
+plot <- ggplot(agency_scatter[agency_scatter$cnt > 1,], aes(x=cen, y=cnt, label = name)) +
+  geom_point(size = 5, aes(colour = factor(name))) +
+  geom_text(
+    aes(label=ifelse(name %in% c("ICM","DeFiore and Company","HG Literary"),
+                     as.character(name),'')), size=3) +
+  geom_smooth(method='lm') +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    panel.grid.major = element_blank(), 
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    legend.position = "none") +
+  scale_color_manual(values = wes_palette(n=length(agency_scatter[agency_scatter$cnt > 1,]$name),
+                                          name = "Darjeeling1",
+                                          type = "continuous")) +
+  ylab("# of Debut Authors Represented") + xlab("Agency 'Centrality' Score")
+
+# Use plotly to make the plot interactive (tooltips.)
+ggplotly(plot, tooltip = "label")  %>% 
+  config(displayModeBar = FALSE) %>%
+  onRender("function(el, x) {Plotly.d3.select('.cursor-crosshair').style('cursor', 'default')}")
+```
+
+> One last thing: the hot mess fallacy
+
+The number one curiosity for me re: writers and agents and writers and editors is
+the mysterious alchemy of transforming a manuscript into something publication
+ready. The way they tell it, you can only secure an agent if you send them the 
+best, most polished, most perfect novel and anything less is a waste
+of your time and theirs. At the same time, a quick glance through the
+acknowledgements tells... a different story. The way authors talk, they
+walked up to their agents / editors with a hot piece of garbage which was duly 
+transformed. Is this just writerly self-effacement? Or something else? Any
+writers out there will to share the manuscript they first sent their agent so we
+can compare it to what was published? (Don't all jump up at once.)
+
+Until that happens, I expect it will remain a mystery. In the mean time, a
+sample of some unattributed acknowledgements so you know what I'm referring to.
+
+**A sample of acknowledgements that make it seem like the novel may not have been
+complete before the author found representation `r emo::ji("thinking")`:**
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+    "To the amazing [Agent] who saw this novel's potential
+long, long before I did and who tirelessly guided me in every step of the journey."<br/>–A writer
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"I owe a thousand thanks also to [Agent], who fell in love
+with this book so many years ago and stayed with it until it was ready to be
+brought out into the world."<br/>–Another writer
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"[To] my agent, without whose intervention I would have kept rewriting the same five chapters of this book forever."<br/>–Yet another writer
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"[To] my editor, who polished this story until it shone."<br/>–Yet another writer
+still
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"[To] my agent, who believed in this book, and in me, long before I did. I would never have finished without you."<br/>–A different writer
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"Were it not for [Agent], this book would be a pile of Post-its and I an incoherent shell."<br/>–Someone else
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"My agent cheered me on from the moment I first mentioned the idea."<br/>
+–Another writer
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"In [Agent's] first editorial letter, she wrote that the draft had many beautiful moments, but “needs some serious work." In other words, as she later told me: I
+needed to rewrite the whole thing."<br/>–Different guy
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"[To Agent], for taking me on, for revising the entire manuscript three times."
+<br/>–Three times!
+</p>
+
+------
+
+<p style="font-family: times, serif; font-size:14pt; font-style:italic">
+"[Agent]: dear friend, vital first reader, and agent extraordinaire, who
+believed in this book before it existed."<br/>–You get the idea
+</p>
