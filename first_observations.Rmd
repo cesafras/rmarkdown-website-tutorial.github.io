@@ -32,7 +32,7 @@ One of the most oft repeated pieces of advice for aspiring writers looking for
 literary agents is to look at the acknowledgements section of novels to see
 which literary agents represent the writers they admire. From there, the advice
 goes, just query those agents and, with a bit of work and kismit, one day 
-*you'll* be the published author whose acknowledgements people are trolling.
+*you'll* be the published author whose acknowledgements people are trawling.
 
 Okay, then!
 
@@ -59,8 +59,10 @@ writing literary fiction and looking for agents) to enjoy. Answers to all your
 most burning questions below, e.g.:
 
 * Who should my agent be?
-* What MFAs/workshops/residencies should I apply to?
+* What are the top MFAs/workshops/residencies?
 * Is Alexander Chee really the most beloved writer in America?
+
+Let's jump in!
 
 ```{r palettes, echo=FALSE}
 # Color palettes: for this analysis we use Darjeeling1
@@ -347,16 +349,15 @@ That individual is none other than... **Katie!**
 
 I know, I know, there are lots of Katies out there supporting the arts, but... it's really hard to get into Bread Loaf or Tin House. Finding a Katie to stan my work, though? Feels more doable.
 
-*On a related note, now feels like a good time to mention that this analysis was
-heavily inspired by Richard Jean Ho's work on race in publishing. I've always
-dreamed of the day that someone would successfully "Moneyball literature" and while
-that's not exactly what he's doing, I really admire the use of data and analytics
-to understand books and book publishing. Although my analysis does not directly
+*Note: now feels like a good time to mention that this analysis was inspired by Richard Jean So's [work in the New York Times](https://www.nytimes.com/interactive/2020/12/11/opinion/culture/diversity-publishing-industry.html) on race in publishing. I've always dreamed of the day
+that someone would successfully "Moneyball literature" and while that's not
+exactly what he's doing, I really admire the use of data and analytics to
+understand books and book publishing. Although my analysis does not directly
 deal with race, some of my conclusions are related. Namely that the social
-networks that award nominated writers navigate are quite compact (more on that
-below) and—related to the Katie point—succeeding in the literary fiction game
-requires the support of white people and institutions. (80% of people named Katie
-are white, and 80% of agents and editors are white.)*
+networks of award nominated writers are quite compact (more on that below)
+and—related to the Katie point—succeeding in the literary fiction game requires
+the support of white people and institutions. (80% of people named Katie are
+white, and 80% of agents and editors are white.)*
 
 ```{r most_thanked, include = FALSE}
 df_most_thanked_entities <- df_total %>%
@@ -504,7 +505,7 @@ df_total_thanked <- left_join(df_people_thanked, df_orgs_thanked, by = c("entity
   mutate(total_thanked = cnt.x + cnt.y)
 df_total_thanked[is.na(df_total_thanked)] <- 0
 
-p5 <- ggplot(df_total_thanked, aes(x=total_thanked)) + 
+p5 <- ggplot(df_total_thanked[df_total_thanked$total_thanked <= 80,], aes(x=total_thanked)) + 
   geom_histogram(binwidth=10, fill="#00A08A", color="#e9ecef", alpha=0.9) +
   theme(legend.position = "none",
         axis.ticks.x=element_blank(),
@@ -517,7 +518,7 @@ p5 <- ggplot(df_total_thanked, aes(x=total_thanked)) +
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  scale_x_continuous(breaks = seq(0,90, 10)) +
+  scale_x_continuous(breaks = seq(0,80, 10)) +
   labs(subtitle = "Number of Acknowledgements")
 
 # Number of words in the acknowledgements.
@@ -534,7 +535,7 @@ p6 <- ggplot(dedup, aes(x=Word.count)) +
         panel.background = element_blank(),
         panel.border = element_blank(),
         axis.line = element_blank()) +
-  scale_x_continuous(breaks = seq(0, 9000, 1000)) +
+  scale_x_continuous(breaks = seq(0, 8000, 1000)) +
   labs(subtitle = "Word Count of Acknowledgements")
 
 ggarrange(p5, p6, ncol = 1)
@@ -656,7 +657,7 @@ forceNetwork(Links = df_links, Nodes = df_nodes,
              Group = 'group',
              linkColour = "FFFFFF",
              Nodesize = 3,
-             fontSize=16,
+             fontSize=10,
              legend=T,
              opacity = .8,
              bounded = F,
@@ -743,6 +744,7 @@ highcharter::highchart() %>%
 ```
 
 **Breaking it down: the 8 types of writing communities**
+<p><small>*Inspired by FiveThirtyEight's ["Hollywood Taxonomy."](https://fivethirtyeight.com/tag/hollywood-taxonomy/)*</small></p>
 
 ## <span style="color: #CC201B;">The Road Not Taken</span>
 
@@ -813,12 +815,10 @@ University) is both MFA and NYC. Who said writers can't have it all!
 **Member Entities**: MacDowell, Alexander Chee, Aragi, Inc., Trident Media Group, Yaddo, Andra Miller, NYU, Michelle Koufopolous, University of New Mexico
 
 If you spend like five seconds on literary Twitter you will encounter this name:
-Alexander Chee. Seriously, from where I sit, he seems like the Tom Cruise (Harry
-Styles? I don't celebrities) of the literary community. He's a BIG DEAL. So are
-certain artists' colonies, like MacDowell and Yaddo, which you can read about,
-but are basically cabin in the woods type situations where only the best, most
-talented writers are invited to stay and take their lunch in hand-delivered
-picnic baskets.
+Alexander Chee. Seriously, from where I sit, he seems like the Tom Cruise (the 
+Harry Styles? the Timothee Chalamet? I don't know celebrities) of the literary community. He's a BIG DEAL. So are certain artists' colonies, like MacDowell and Yaddo, which you can read about, but are basically cabin in the woods type
+situations where only the best, most talented writers are invited to stay and
+take their lunch in hand-delivered picnic baskets.
 
 ## <span style="color: #F69100;">That National Book Award Energy</span>
 
@@ -943,7 +943,7 @@ ggplotly(plot, tooltip = "label")  %>%
   onRender("function(el, x) {Plotly.d3.select('.cursor-crosshair').style('cursor', 'default')}")
 ```
 
-> One last thing: the hot mess fallacy
+> One more thing: the hot mess fallacy
 
 The number one curiosity for me re: writers and agents and writers and editors is
 the mysterious alchemy of transforming a manuscript into something publication
@@ -1029,3 +1029,11 @@ needed to rewrite the whole thing."<br/>–Different guy
 "[Agent]: dear friend, vital first reader, and agent extraordinaire, who
 believed in this book before it existed."<br/>–You get the idea
 </p>
+
+> Final conclusions
+
+I feel like I learned a lot here. Roughly the equivalent of trawling Twitter
+for... many weeks. How about you? Any questions, comments or feedback? Anything I 
+should add or subtract? (Let me know in the comments! Send me a like. Smash
+that subscribe button, etc. etc. Just kidding. I'm old fashioned. You can 
+<a href="mailto:cer1029@gmail.com">shoot me an email</a>.)
