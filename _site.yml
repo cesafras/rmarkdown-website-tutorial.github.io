@@ -1,11 +1,20 @@
 name: "Cecilia Esther Rabess's Website"
 navbar:
-  title: "HOME"
+  title: "CECILIA ESTHER RABES"
   left:
-    - text: "GET YOU A KATIE: An Analysis of Debut Novel Acknowledgements"
+    - text: "GET YOU A KATIE: An Analysis of Debut Novels"
       href: first_observations.html
     - text: "EVERYTHING'S FINE: My Debut Novel"
       href: everythings_fine.html
+  right:
+    - icon: fa-envelope-o
+      href: mailto:cer1029@gmail.com                     # CHANGE HERE 
+    - icon: fa-twitter
+      href: https://twitter.com/cesafras
+    - icon: fa-github
+      href: https://github.com/cesafras/vigilant-adventure         # CHANGE HERE 
+    - icon: fa-goodreads
+      href: https://www.goodreads.com/user/show/46005199-cecilia-rabess
 output_dir: "."
 output:
   html_document:
