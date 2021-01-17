@@ -8,9 +8,11 @@ navbar:
       href: everythings_fine.html
   right:
     - icon: fa-envelope-o
-      href: mailto:cer1029@gmail.com 
-    - icon: fa-twitter
-      href: https://twitter.com/cesafras
+      href: mailto:cer1029@gmail.com
+    - icon: fa-instagram
+      href: https://www.instagram.com/cesafras/
+    #- icon: fa-twitter
+      #href: https://twitter.com/cesafras
     #- icon: fa-github
      # href: https://github.com/cesafras/vigilant-adventure
     - icon: fa-wordpress
