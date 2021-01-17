@@ -11,8 +11,10 @@ navbar:
       href: mailto:cer1029@gmail.com 
     - icon: fa-twitter
       href: https://twitter.com/cesafras
-    - icon: fa-github
-      href: https://github.com/cesafras/vigilant-adventure
+    #- icon: fa-github
+     # href: https://github.com/cesafras/vigilant-adventure
+    - icon: fa-wordpress
+      href: https://estherthebester.wordpress.com/
 output_dir: "."
 output:
   html_document:
