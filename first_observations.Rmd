@@ -455,7 +455,7 @@ I hope that makes sense! (It's actually slightly more messy / complicated than
 I'm making it out to be. If you're interested in the source code, [here](https://github.com/cesafras/vigilant-adventure/blob/gh-pages/first_observations.Rmd) it is.)
 
 *Note also: I did not really check my work, however I did watch a conversation
-between [Lucy Tan](https://lucyrtan.com/) and [Susie Yang](https://www.susiebooks.com/) hosted by everyone's favorite Brooklyn bookstore
+between [Lucy Tan](https://lucyrtan.com/) and [Susie Yang](https://www.susiebooks.com/) (both of whose novels I've read; they are great!) hosted by everyone's favorite Brooklyn bookstore
 [Books Are Magic](https://www.booksaremagic.net/) in which they revealed a long-standing friendship, so the fact
 that they show up so close together in the graph is... super vindicating.*
 
