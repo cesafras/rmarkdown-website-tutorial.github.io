@@ -379,7 +379,7 @@ colorize <- function(x, color) {
 }
 ```
 
-`r colorize("The graphic above is a social network constructed of the  people (and organizations) mentioned in the acknowledgements sections of 80 novels longlisted for the Center for Fiction First Novel Prize.", "red")`
+`r colorize("The graphic above is a social network constructed of the  people (and organizations) mentioned in the acknowledgements sections of 80 novels longlisted for the [Center for Fiction First Novel Prize](https://centerforfiction.org/grants-awards/the-first-novel-prize/).", "red")`
 
 > TL;DR
 
@@ -393,7 +393,7 @@ Each node (bubble) in the graph is color coded based on whether the entity is a:
 The bigger the node and the closer the node to the center of the graph the more
 influential that bubble is within social network. "Influential" here just means
 that more novelists have mentioned that particular entity in their
-acknowledgements. So the biggest bubble (Bread Loaf) represents the node in the
+acknowledgements. So the biggest bubble ([Bread Loaf](https://www.middlebury.edu/writers-conferences/)) represents the node in the
 network that is most influential (i.e. was mentioned by the most novelists.)
 
 You can hover or click on the nodes / bubbles to see what other entities they are
@@ -432,7 +432,7 @@ From there I really only had a couple of questions:
 
 * Is every writer friends with every other writer, or is that a myth perpetuated
 by literary Twitter?
-* And speaking of literary Twitter, is Alexander Chee the most beloved individual
+* And speaking of literary Twitter, is [Alexander Chee](https://twitter.com/alexanderchee) the most beloved individual
 in the writing community?
 
 To put my intuition to the test I constructed the social graph you see before
@@ -441,7 +441,7 @@ writer, though, I didn't include it.) To build the dataset I used a natural
 language processing model to extract all of the named entities (i.e. the people,
 places, and things) from the text of each author's acknowledgements. (The
 text content of each acknowledgement was scraped from a combination of Google
-Books, Amazon, and Axis360, the digital library.)
+Books, Amazon, and [Axis360](https://sfpl.axis360.baker-taylor.com/), the digital library.)
 
 Note that there are two major limitations with my approach which I will call
 out now:
@@ -466,8 +466,8 @@ I hope that makes sense! (It's actually slightly more messy / complicated than
 I'm making it out to be. If you're interested in the source code, [here](https://github.com/cesafras/vigilant-adventure/blob/gh-pages/first_observations.Rmd) it is.)
 
 *Note also: I did not really check my work, however I did watch a conversation
-between Lucy Tan and Susie Yang hosted by everyone's favorite Brooklyn bookstore
-Books Are Magic in which they revealed a long-standing friendship, so the fact
+between [Lucy Tan](https://lucyrtan.com/) and [Susie Yang](https://www.susiebooks.com/) hosted by everyone's favorite Brooklyn bookstore
+[Books Are Magic](https://www.booksaremagic.net/) in which they revealed a long-standing friendship, so the fact
 that they show up so close together in the graph is... super vindicating.*
 
 > Learnings
