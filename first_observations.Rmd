@@ -368,18 +368,7 @@ forceNetwork(Links = df_links, Nodes = df_nodes,
              colourScale = JS(ColourScale))
 ```
 
-```{r colorize, echo = FALSE}
-colorize <- function(x, color) {
-  if (knitr::is_latex_output()) {
-    sprintf("\\textcolor{%s}{%s}", color, x)
-  } else if (knitr::is_html_output()) {
-    sprintf("<span style='color: %s; font-weight: bold'>%s</span>", color, 
-      x)
-  } else x
-}
-```
-
-`r colorize("The graphic above is a social network constructed of the  people (and organizations) mentioned in the acknowledgements sections of 80 novels longlisted for the [Center for Fiction First Novel Prize](https://centerforfiction.org/grants-awards/the-first-novel-prize/).", "red")`
+<span style='color: red; font-weight: bold'>The graphic above is a social network constructed of the  people (and organizations) mentioned in the acknowledgements sections of 80 novels longlisted for the [Center for Fiction First Novel Prize](https://centerforfiction.org/grants-awards/the-first-novel-prize/).</span>
 
 > TL;DR
 
