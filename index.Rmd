@@ -10,5 +10,5 @@ output:
 document.title = "Cecilia Esther Rabess"
 ```
 
-I'm a [novelist](first_observations.html) and
+I'm a [novelist](https://www.instagram.com/p/CL9lX0iL0wW/) and
 [data scientist](first_observations.html) in San Francisco.
