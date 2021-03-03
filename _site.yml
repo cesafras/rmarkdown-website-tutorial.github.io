@@ -2,21 +2,21 @@ name: "Cecilia Esther Rabess's Website"
 navbar:
   title: "CECILIA ESTHER RABESS"
   left:
-    - text: "GET YOU A KATIE: An Analysis of Debut Novels"
+    - text: "A Literary Social Network"
       href: first_observations.html
-    - text: "EVERYTHING'S FINE: My Debut Novel"
-      href: everythings_fine.html
+    #- text: "EVERYTHING'S FINE: My Debut Novel"
+     # href: everythings_fine.html
   right:
     - icon: fa-envelope-o
-      href: mailto:cer1029@gmail.com
+      href: mailto:cesafras@gmail.com
     - icon: fa-instagram
       href: https://www.instagram.com/cesafras/
     #- icon: fa-twitter
       #href: https://twitter.com/cesafras
     #- icon: fa-github
      # href: https://github.com/cesafras/vigilant-adventure
-    - icon: fa-wordpress
-      href: https://estherthebester.wordpress.com/
+    #- icon: fa-wordpress
+     # href: https://estherthebester.wordpress.com/
 output_dir: "."
 output:
   html_document:
